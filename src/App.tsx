@@ -448,6 +448,343 @@ function EnrollmentModal({
   )
 }
 
+/* ─── Coach Photos Gallery ─── */
+interface CoachPhoto {
+  id: number
+  img: string
+  title: string
+  badge: string
+  category: 'skills' | 'physique' | 'strength'
+  metric: string
+  desc: string
+}
+
+const COACH_PHOTOS: CoachPhoto[] = [
+  {
+    id: 1,
+    img: '/1.JPG',
+    title: 'One-Arm Handstand',
+    badge: 'Calisthenics Mastery',
+    category: 'skills',
+    metric: 'Unilateral Balance & Core Stability',
+    desc: 'Years of progressive shoulder conditioning, wrist endurance, and full-body kinetic tension.',
+  },
+  {
+    id: 2,
+    img: '/2.JPG',
+    title: 'V-Taper & Lat Architecture',
+    badge: 'Functional Back',
+    category: 'physique',
+    metric: 'Scapular Control & Lat Density',
+    desc: 'Dense upper back forged with heavy weighted pull-ups, back levers, and calisthenic rows.',
+  },
+  {
+    id: 3,
+    img: '/3.JPG',
+    title: 'Hypertrophy & Symmetry',
+    badge: 'Hybrid Athlete',
+    category: 'strength',
+    metric: 'Muscular Conditioning & Form',
+    desc: 'Combining bodyweight compound mastery with isolated hypertrophy for an aesthetic physique.',
+  },
+  {
+    id: 4,
+    img: '/4.JPG',
+    title: 'Upper-Body Power Pose',
+    badge: 'Shoulders & Biceps',
+    category: 'strength',
+    metric: 'Chest & Arm Conditioning',
+    desc: 'Explosive pushing strength built through ring dips, handstand push-ups, and planche training.',
+  },
+  {
+    id: 5,
+    img: '/5.JPG',
+    title: 'Relentless Conditioning',
+    badge: 'Athlete Mindset',
+    category: 'physique',
+    metric: 'Single-Digit Body Fat & Definition',
+    desc: 'Uncompromising standard of nutrition, high-intensity volume, and calisthenics consistency.',
+  },
+  {
+    id: 6,
+    img: '/6.JPG',
+    title: 'Athletic V-Taper Pose',
+    badge: 'Peak Performance',
+    category: 'skills',
+    metric: 'Explosive Bodyweight Power',
+    desc: 'True functional fitness: muscle that moves effortlessly with speed, agility, and mobility.',
+  },
+]
+
+function CoachGallery() {
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'skills' | 'strength' | 'physique'>('all')
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  const filteredPhotos = selectedCategory === 'all'
+    ? COACH_PHOTOS
+    : COACH_PHOTOS.filter((p) => p.category === selectedCategory)
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIndex(null)
+      if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev !== null ? (prev + 1) % filteredPhotos.length : null))
+      }
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev !== null ? (prev - 1 + filteredPhotos.length) % filteredPhotos.length : null))
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [lightboxIndex, filteredPhotos.length])
+
+  return (
+    <section id="gallery" className="py-16 md:py-24 px-4 relative overflow-hidden bg-gradient-to-b from-transparent via-blue-50/40 to-transparent">
+      {/* Ambient background blur orbs */}
+      <div className="absolute top-1/4 -left-24 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+      <div className="absolute bottom-1/4 -right-24 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-100/80 text-blue-700 border border-blue-200 shadow-sm mb-4">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
+            <span className="w-2 h-2 rounded-full bg-blue-600 -ml-3.5" />
+            <span>REAL ATHLETE • PROVEN PHYSIQUE</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-bold text-text-h tracking-tight mb-3">
+            Coach in Action
+          </h2>
+          <p className="text-base md:text-lg text-text leading-relaxed">
+            Every skill taught is a skill mastered. Explore the standard of bodyweight strength, mobility, and aesthetic conditioning behind your training plan.
+          </p>
+
+          {/* Filter Tabs */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+            {[
+              { id: 'all', label: 'All Photos', count: COACH_PHOTOS.length },
+              { id: 'skills', label: 'Calisthenics & Skills', count: COACH_PHOTOS.filter(p => p.category === 'skills').length },
+              { id: 'strength', label: 'Strength & Hypertrophy', count: COACH_PHOTOS.filter(p => p.category === 'strength').length },
+              { id: 'physique', label: 'Physique & Conditioning', count: COACH_PHOTOS.filter(p => p.category === 'physique').length },
+            ].map((tab) => {
+              const active = selectedCategory === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedCategory(tab.id as typeof selectedCategory)}
+                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                    active
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Photo Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {filteredPhotos.map((photo, index) => (
+            <div
+              key={photo.id}
+              onClick={() => setLightboxIndex(index)}
+              style={{ animationDelay: `${index * 80}ms` }}
+              className="animate-card-entrance group relative rounded-2xl overflow-hidden bg-gray-900 border border-gray-200/80 shadow-md hover:shadow-2xl hover:border-blue-500/60 transition-all duration-500 hover:-translate-y-2 cursor-pointer flex flex-col"
+            >
+              {/* Outer dynamic ambient glow ring on hover */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 -z-10" />
+
+              {/* Shimmer sweep effect */}
+              <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-[-25deg] -translate-x-full group-hover:animate-shimmer" />
+              </div>
+
+              {/* Image Container with portrait ratio */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-950">
+                <img
+                  src={photo.img}
+                  alt={photo.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover object-center scale-100 group-hover:scale-110 transition-transform duration-700 ease-out"
+                />
+
+                {/* Scrim Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10 group-hover:from-black/95 group-hover:via-black/45 transition-all duration-300" />
+
+                {/* Top Badge */}
+                <div className="absolute top-3.5 left-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-md group-hover:border-blue-400/80 transition-colors">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                  <span>{photo.badge}</span>
+                </div>
+
+                {/* Top-Right Expand Action */}
+                <div
+                  className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center justify-center shadow-md group-hover:scale-110 group-hover:bg-blue-600 group-hover:border-blue-500 transition-all duration-300"
+                  title="View Fullscreen"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6m0 0v6m0-6L14 10M9 21H3m0 0v-6m0 6l7-7" />
+                  </svg>
+                </div>
+
+                {/* Content Overlay at bottom of card */}
+                <div className="absolute inset-x-0 bottom-0 p-5 z-10 flex flex-col justify-end text-left">
+                  <div className="inline-block mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-950/70 border border-blue-800/60 px-2 py-0.5 rounded">
+                      {photo.metric}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-blue-200 transition-colors">
+                    {photo.title}
+                  </h3>
+
+                  <p className="text-xs text-gray-300 mt-1.5 leading-relaxed line-clamp-2 group-hover:text-gray-200 transition-colors">
+                    {photo.desc}
+                  </p>
+
+                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-medium text-gray-300">
+                    <span className="group-hover:text-blue-300 transition-colors flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Tap to enlarge
+                    </span>
+                    <span className="text-[11px] font-semibold text-blue-400 group-hover:translate-x-1 transition-transform inline-flex items-center">
+                      Explore →
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox Modal */}
+      {lightboxIndex !== null && filteredPhotos[lightboxIndex] && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md animate-[modalIn_0.25s_ease-out]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLightboxIndex(null)
+          }}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-lg"
+            aria-label="Close"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Previous photo button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setLightboxIndex((prev) => (prev !== null ? (prev - 1 + filteredPhotos.length) % filteredPhotos.length : null))
+            }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-lg hover:scale-105"
+            aria-label="Previous photo"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Next photo button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setLightboxIndex((prev) => (prev !== null ? (prev + 1) % filteredPhotos.length : null))
+            }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-lg hover:scale-105"
+            aria-label="Next photo"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Main Lightbox Content */}
+          <div className="relative max-w-4xl w-full max-h-[92vh] flex flex-col items-center justify-center">
+            {/* Image Box */}
+            <div className="relative max-h-[72vh] w-auto overflow-hidden rounded-2xl border border-white/15 shadow-2xl bg-black">
+              <img
+                src={filteredPhotos[lightboxIndex].img}
+                alt={filteredPhotos[lightboxIndex].title}
+                className="max-h-[72vh] w-auto max-w-full object-contain mx-auto"
+              />
+            </div>
+
+            {/* Captions Bar */}
+            <div className="mt-4 w-full bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-white text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-600 text-white">
+                    {filteredPhotos[lightboxIndex].badge}
+                  </span>
+                  <span className="text-xs text-blue-300 font-medium">
+                    {filteredPhotos[lightboxIndex].metric}
+                  </span>
+                </div>
+                <h4 className="text-lg font-bold">
+                  {filteredPhotos[lightboxIndex].title}
+                </h4>
+                <p className="text-xs text-gray-300 max-w-xl">
+                  {filteredPhotos[lightboxIndex].desc}
+                </p>
+              </div>
+
+              {/* Counter and Thumbnails */}
+              <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                <span className="text-xs text-gray-400 font-mono">
+                  {lightboxIndex + 1} / {filteredPhotos.length}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {filteredPhotos.map((thumb, idx) => (
+                    <button
+                      key={thumb.id}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setLightboxIndex(idx)
+                      }}
+                      className={`w-8 h-8 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                        idx === lightboxIndex ? 'border-blue-500 scale-110' : 'border-transparent opacity-50 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={thumb.img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
 /* ─── Main App ─── */
 export default function App() {
   const [enrollPlan, setEnrollPlan] = useState<string | null>(null)
@@ -475,6 +812,9 @@ export default function App() {
               </span>
             </div>
             <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+              <a href="#gallery" className="text-text hover:text-blue-600 transition">
+                Gallery
+              </a>
               <a href="#programs" className="text-text hover:text-blue-600 transition">
                 Programs
               </a>
@@ -511,6 +851,9 @@ export default function App() {
           </a>
         </div>
       </header>
+
+      {/* Coach Photos Gallery - Just below Hero Section */}
+      <CoachGallery />
 
       <section id="programs" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
